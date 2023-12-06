@@ -114,7 +114,11 @@ public class Main {
         Predicate<Customer> isTierlevel2 = customer -> customer.getTier() == 2;
 
 
-        List<String> filteredOrders = orderList.stream().filter(isDateRight).map(ord -> ord.getProductList().toString()).toList();
+        List<Order> filteredOrders = orderList.stream().filter(ord -> ord.getCustomer().getTier() == 2
+                && ord.getOrderDate().isAfter(startDate)
+                && ord.getOrderDate().isBefore(endDate)).toList();
+
+        filteredOrders.forEach(System.out::println);
 
         log.info(filteredOrders.toString());
     }
