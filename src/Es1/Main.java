@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -65,12 +66,16 @@ public class Main {
         //Ottenere una lista di ordini con prodotti che appartengono alla categoria «Baby»
 
         Customer mario = new Customer("Mario", 2);
-
+        List<Order> marioList = new ArrayList<>();
 
         Order order1 = new Order("Pending", now, tomorrow, mainList, mario);
+        marioList.add(order1);
         Predicate<Product> isBabyCategory = product -> product.category == "Baby";
 
-        List<String> babyCategory = mainList.stream().filter(isBabyCategory).map(toy -> toy.getName() + " " + toy.getPrice()).toList();
+        List<String> babyCategory = marioList.stream()
+                .flatMap(ord -> ord.getProductList().stream().filter(isBabyCategory))
+                .map(Product::getName)
+                .collect(Collectors.toList());
         log.info("Ordini appartenenti alla categoria Baby:" + babyCategory);
 
 
@@ -83,6 +88,11 @@ public class Main {
 
         //Ottenere una lista di prodotti ordinati da clienti di livello (tier) 2 tra l’01-Feb-2021 e l’01-Apr-2021
 
+        List<Product> orders = new ArrayList<>();
+        orders.add(book1);
+        orders.add(toy1);
+        orders.add(boy2);
+
         LocalDate startDate = LocalDate.of(2021, 2, 1);
         LocalDate endDate = LocalDate.of(2021, 4, 1);
 
@@ -94,8 +104,8 @@ public class Main {
 
         List<Order> orderList = new ArrayList<>();
 
-        Order order2 = new Order("Preparing", orderDate, tomorrow, mainList, luigi);
-        Order order3 = new Order("Shipped", orderDate, shippingDate, mainList, wario);
+        Order order2 = new Order("Preparing", now, tomorrow, orders, luigi);
+        Order order3 = new Order("Shipped", orderDate, shippingDate, orders, wario);
 
         orderList.add(order2);
         orderList.add(order3);
@@ -104,7 +114,7 @@ public class Main {
         Predicate<Customer> isTierlevel2 = customer -> customer.getTier() == 2;
 
 
-        List<String> filteredOrders = orderList.stream().filter(isDateRight).map(order -> order.getOrderDate() + " " + order.getStatus()).toList();
+        List<String> filteredOrders = orderList.stream().filter(isDateRight).map(ord -> ord.getProductList().toString()).toList();
 
         log.info(filteredOrders.toString());
     }
